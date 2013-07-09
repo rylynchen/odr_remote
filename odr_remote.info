@@ -2,3 +2,4 @@ name = Odr Remote
 description = Orth doctor register remote module.
 package = ODR
 core = 7.x
+configure = admin/config/system/odr_remote

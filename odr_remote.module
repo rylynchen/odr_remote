@@ -5,13 +5,100 @@
  */
 function odr_remote_menu() {
   $items = array();
-  $items['admin/config/people/or_mail'] = array(
-    'title' => t('Orth mail config'),
+  $items['admin/config/system/odr_remote'] = array(
+    'title' => t('ODR Remote Settings'),
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('or_mail_settings_form'),
-    'access arguments' => array('administer or mail'),
+    'page arguments' => array('odr_remote_settings_form'),
+    'access arguments' => array('administer odr remote'),
     'type' => MENU_NORMAL_ITEM,
-    'file' => 'or_mail.admin.inc',
+    'file' => 'odr_remote.admin.inc',
+  );
+  $items['odr_remote/request/%/%'] = array(
+    'page callback' => 'odr_remote_request_callback',
+    'page arguments' => array(3),
+    'access callback' => 'odr_remote_request_access',
+    'access arguments' => array(2),
+    'type' => MENU_CALLBACK,
+  );
+  $items['odr_remote/test'] = array(
+    'title' => t('ODR Remote Test'),
+    'page callback' => 'odr_remote_test',
+    'access arguments' => array('administer odr remote'),
+    'type' => MENU_NORMAL_ITEM,
   );
   return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function odr_remote_permission() {
+  return array(
+    'administer odr remote' => array(
+      'title' => t('Administer ODR remote'),
+      'description' => t('Access to administer ODR remote.'),
+    ),
+  );
+}
+
+/**
+ * Access to remote request.
+ *
+ * @param $key
+ */
+function odr_remote_request_access($key) {
+	$keys = explode("\n\r", variable_get('odr_remote_keys', ''));
+	return !empty($key) && in_array($key, $keys);
+}
+
+/**
+ * ODR remote request callback.
+ *
+ * @param $type
+ */
+function odr_remote_request_callback($type) {
+	$json = array();
+	switch ($type) {
+		case 'get_doc_profile_by_identity':
+			$identity_type = $_POST['identity_type'];
+			$identity_number = $_POST['identity_number'];
+			$json['status'] = 1;
+			$json['data'] = odr_remote_get_doc_profile_by_identity($identity_type, $identity_number);
+			break;
+		/**
+		 * Add more remote request here.
+		 */
+		default:
+			$json['status'] = 0;
+			$json['msg'] = t('Unknown request type.');
+			break;
+	}
+	drupal_json_output($json);
+}
+
+/**
+ * ODR remote get doctor profile by identity number.
+ *
+ * @param $identity_type
+ *
+ * @param $identity_number
+ */
+function odr_remote_get_doc_profile_by_identity($identity_type, $identity_number) {
+	$data = array('ret' => 0, 'data' => array());
+	$query = new EntityFieldQuery();
+	$query->entityCondition('entity_type', 'profile2')
+	  ->entityCondition('bundle', 'main')
+	  ->propertyCondition('status', 1)
+	  ->fieldCondition('field_user_cord', 'value', $identity_type)
+	  ->fieldCondition('field_user_cordnum', 'value', $identity_number);
+	$result = $query->execute();
+	dpm($result);
+	return $result;
+}
+
+function odr_remote_test() {
+	$identity_type = '身份证';
+	$identity_number = '522101197403193212';
+	$data = odr_remote_get_doc_profile_by_identity($identity_type, $identity_number);
+	return 'odr_remote_test';
 }

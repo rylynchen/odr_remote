@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * Implements hook_uninstall().
+ */
+function odr_remote_uninstall() {
+  variable_del('odr_remote_keys');
+}
