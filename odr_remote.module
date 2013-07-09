@@ -59,7 +59,7 @@ function odr_remote_request_callback() {
 	$json = array();
 	if (isset($_POST['identity_type'])) {
 		$identity_type = $_POST['identity_type'];
-		switch ($type) {
+		switch ($identity_type) {
 			case 'get_doc_profile_by_identity':
 				$identity_number = $_POST['identity_number'];
 				$json['status'] = 1;
