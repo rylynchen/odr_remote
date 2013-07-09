@@ -86,10 +86,10 @@ function odr_remote_request_callback($type) {
 function odr_remote_get_doc_profile_by_identity($identity_type, $identity_number) {
 	$data = array('ret' => 0, 'data' => array());
 	$query = new EntityFieldQuery();
-	$query->entityCondition('entity_type', 'profile2')
-	  ->entityCondition('bundle', 'main');
-	  // ->fieldCondition('field_user_cord', 'value', $identity_type)
-	  // ->fieldCondition('field_user_cordnum', 'value', $identity_number);
+	$query->entityCondition('entity_type', 'user')
+	  ->entityCondition('bundle', 'user');
+	  ->fieldCondition('field_user_cord', 'value', $identity_type)
+	  ->fieldCondition('field_user_cordnum', 'value', $identity_number);
 	$result = $query->execute();
 	dpm($result);
 	return $result;
