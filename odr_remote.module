@@ -13,9 +13,8 @@ function odr_remote_menu() {
     'type' => MENU_NORMAL_ITEM,
     'file' => 'odr_remote.admin.inc',
   );
-  $items['odr_remote/request/%/%'] = array(
+  $items['odr_remote/request/%'] = array(
     'page callback' => 'odr_remote_request_callback',
-    'page arguments' => array(3),
     'access callback' => 'odr_remote_request_access',
     'access arguments' => array(2),
     'type' => MENU_CALLBACK,
@@ -56,22 +55,24 @@ function odr_remote_request_access($key) {
  *
  * @param $type
  */
-function odr_remote_request_callback($type) {
+function odr_remote_request_callback() {
 	$json = array();
-	switch ($type) {
-		case 'get_doc_profile_by_identity':
-			$identity_type = $_POST['identity_type'];
-			$identity_number = $_POST['identity_number'];
-			$json['status'] = 1;
-			$json['data'] = odr_remote_get_doc_profile_by_identity($identity_type, $identity_number);
-			break;
-		/**
-		 * Add more remote request here.
-		 */
-		default:
-			$json['status'] = 0;
-			$json['msg'] = t('Unknown request type.');
-			break;
+	if (isset($_POST['identity_type'])) {
+		$identity_type = $_POST['identity_type'];
+		switch ($type) {
+			case 'get_doc_profile_by_identity':
+				$identity_number = $_POST['identity_number'];
+				$json['status'] = 1;
+				$json['data'] = odr_remote_get_doc_profile_by_identity($identity_type, $identity_number);
+				break;
+			/**
+			 * Add more remote request here.
+			 */
+			default:
+				$json['status'] = 0;
+				$json['msg'] = t('Unknown request type.');
+				break;
+		}
 	}
 	drupal_json_output($json);
 }
@@ -91,13 +92,65 @@ function odr_remote_get_doc_profile_by_identity($identity_type, $identity_number
 	  ->fieldCondition('field_user_cord', 'value', $identity_type)
 	  ->fieldCondition('field_user_cordnum', 'value', $identity_number);
 	$result = $query->execute();
-	dpm($result);
-	return $result;
+	if (isset($result['user'])) {
+		$data['ret'] = 1;
+	  $uid = array_pop(array_keys($result['node']));
+	  $account = user_load($uid);
+	  $account_wrapper = entity_metadata_wrapper('user', $account);
+	  $data['data'] = array(
+	  	'uid' => $account->uid,
+	  	'mail' => $account->mail,
+	  	'field_user_name' => $account_wrapper->field_user_name->value(),
+	  	'field_user_sex' => $account_wrapper->field_user_sex->value(),
+	  	'field_user_nation' => $account_wrapper->field_user_nation->value(),
+	  	'field_user_cord' => $account_wrapper->field_user_cord->value(),
+	  	'field_user_cordnum' => $account_wrapper->field_user_cordnum->value(),
+	  	'field_user_age' => $account_wrapper->field_user_age->value(),
+	  	'field_user_image' => $account_wrapper->field_user_image->value(),
+	  	'field_user_title' => $account_wrapper->field_user_title->value(),
+	  	'field_user_duty' => $account_wrapper->field_user_duty->value(),
+	  	'field_user_province' => $account_wrapper->field_user_province->value(),
+	  	'field_user_city' => $account_wrapper->field_user_city->value(),
+	  	'field_user_workunit' => $account_wrapper->field_user_workunit->value(),
+	  	'field_user_hoslevel' => $account_wrapper->field_user_hoslevel->value(),
+	  	'field_user_hostype' => $account_wrapper->field_user_hostype->value(),
+	  	'field_user_keshi' => $account_wrapper->field_user_keshi->value(),
+	  	'field_user_address' => $account_wrapper->field_user_address->value(),
+	  	'field_user_postnum' => $account_wrapper->field_user_postnum->value(),
+	  	'field_unit_phone' => $account_wrapper->field_unit_phone->value(),
+	  	'field_user_telphone' => $account_wrapper->field_user_telphone->value(),
+	  	'field_user_email' => $account_wrapper->field_user_email->value(),
+	  	'field_user_specialitys' => $account_wrapper->field_user_specialitys->value(),
+	  	'field_user_titlenum' => $account_wrapper->field_user_titlenum->value(),
+	  	'field_user_titlenum_gettime' => $account_wrapper->field_user_titlenum_gettime->value(),
+	  	'field_user_worknum' => $account_wrapper->field_user_worknum->value(),
+	  	'field_user_worknum_gettime' => $account_wrapper->field_user_worknum_gettime->value(),
+	  	'field_user_college' => $account_wrapper->field_user_college->value(),
+	  	'field_user_college_graduate' => $account_wrapper->field_user_college_graduate->value(),
+	  	'field_user_certificate' => $account_wrapper->field_user_certificate->value(),
+	  	'field_user_degree' => $account_wrapper->field_user_degree->value(),
+	  	'field_user_foreign_college' => $account_wrapper->field_user_foreign_college->value(),
+	  	'field_user_foreign_graduate' => $account_wrapper->field_user_foreign_graduate->value(),
+	  	'field_user_foreign_certificate' => $account_wrapper->field_user_foreign_certificate->value(),
+	  	'field_user_foreign_degree' => $account_wrapper->field_user_foreign_degree->value(),
+	  	'field_user_resume' => $account_wrapper->field_user_resume->value(),
+	  	'field_user_experience' => $account_wrapper->field_user_experience->value(),
+	  	'field_user_information' => $account_wrapper->field_user_information->value(),
+	  	'field_user_title1' => $account_wrapper->field_user_title1->value(),
+	  	'field_user_title2' => $account_wrapper->field_user_title2->value(),
+	  	'field_user_title3' => $account_wrapper->field_user_title3->value(),
+	  	'field_user_specialitys1' => $account_wrapper->field_user_specialitys1->value(),
+	  	'field_user_specialitys2' => $account_wrapper->field_user_specialitys2->value(),
+	  	'field_user_specialitys3' => $account_wrapper->field_user_specialitys3->value(),
+	  );
+	}
+	return $data;
 }
 
 function odr_remote_test() {
 	$identity_type = '身份证';
 	$identity_number = '522101197403193212';
 	$data = odr_remote_get_doc_profile_by_identity($identity_type, $identity_number);
+
 	return 'odr_remote_test';
 }
