@@ -5,10 +5,12 @@
  */
 function odr_remote_settings_form($form, &$form_state) {
 	$form = array();
+  $form['#attributes'] = array('class' => array('odr_remote_settings_form'));
   $form['generate'] = array(
     '#type' => 'submit',
     '#value' => t('Generate a Key'),
     '#submit' => array('odr_remote_settings_form_generate_submit'),
+    '#suffix' => '<div class="clear"></div>',
     '#validate' => array(),
     '#limit_validation_errors' => array(),
     '#ajax'=> array(
@@ -28,6 +30,7 @@ function odr_remote_settings_form($form, &$form_state) {
     '#attributes' => array('class' => array('odr_remote_keys')),
     '#default_value' => variable_get('odr_remote_keys', ''),
   );
+  $form['#attached']['css'][] = drupal_get_path('module', 'odr_remote').'/odr_remote.css';
   $form['#attached']['js'][] = drupal_get_path('module', 'odr_remote').'/odr_remote.js';
   return system_settings_form($form);
 }
