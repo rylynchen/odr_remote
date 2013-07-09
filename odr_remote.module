@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function odr_remote_menu() {
+  $items = array();
+  $items['admin/config/people/or_mail'] = array(
+    'title' => t('Orth mail config'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('or_mail_settings_form'),
+    'access arguments' => array('administer or mail'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'or_mail.admin.inc',
+  );
+  return $items;
+}
