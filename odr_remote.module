@@ -88,7 +88,6 @@ function odr_remote_get_doc_profile_by_identity($identity_type, $identity_number
 	$query = new EntityFieldQuery();
 	$query->entityCondition('entity_type', 'profile2')
 	  ->entityCondition('bundle', 'main')
-	  ->propertyCondition('status', 1)
 	  ->fieldCondition('field_user_cord', 'value', $identity_type)
 	  ->fieldCondition('field_user_cordnum', 'value', $identity_number);
 	$result = $query->execute();
