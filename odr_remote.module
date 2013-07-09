@@ -57,10 +57,11 @@ function odr_remote_request_access($key) {
  */
 function odr_remote_request_callback() {
 	$json = array();
-	if (isset($_POST['identity_type'])) {
-		$identity_type = $_POST['identity_type'];
-		switch ($identity_type) {
+	if (isset($_POST['type'])) {
+		$type = $_POST['type'];
+		switch ($type) {
 			case 'get_doc_profile_by_identity':
+				$identity_type = $_POST['identity_type'];
 				$identity_number = $_POST['identity_number'];
 				$json['status'] = 1;
 				$json['data'] = odr_remote_get_doc_profile_by_identity($identity_type, $identity_number);
