@@ -95,7 +95,7 @@ function odr_remote_get_doc_profile_by_identity($identity_type, $identity_number
 	$result = $query->execute();
 	if (isset($result['user'])) {
 		$data['ret'] = 1;
-	  $uid = array_pop(array_keys($result['node']));
+	  $uid = array_pop(array_keys($result['user']));
 	  $account = user_load($uid);
 	  $account_wrapper = entity_metadata_wrapper('user', $account);
 	  $data['data'] = array(
